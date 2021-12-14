@@ -1,6 +1,6 @@
 .header{
     width: 100%;
-    height: 67px;
+    min-height: 67px;
 
     position: sticky;
     top: 0;

@@ -154,7 +154,7 @@ export default function SelectTime() {
                     )
                 })}
             </div>
-            <Footer URL={movie.posterURL} title={movie.title}></Footer>
+            <Footer URL={movie.posterURL} title={movie.title} ></Footer>
         </>
     )
 }

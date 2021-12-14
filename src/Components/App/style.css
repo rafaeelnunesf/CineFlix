@@ -1,7 +1,15 @@
+.root{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
 .page{
     width: 375px;
     height: 877px;
     overflow-y: scroll;
+
+    display: flex;
+    flex-direction: column;
 }
 ::-webkit-scrollbar{
     display: none;

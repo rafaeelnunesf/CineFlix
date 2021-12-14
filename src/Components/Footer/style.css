@@ -6,13 +6,14 @@
     margin-top: 11px;
 
     box-sizing: border-box;
-    padding: 10px 14px;
+    padding: 10px 0 14px 10px;
 
     display: flex;
     gap: 14px;
+    justify-content: space-between;
     
     background: #DFE6ED;
-    border: 1px solid #9EADBA;
+    border-top: 1px solid #9EADBA;
 }
 .img-footer{
     width: 64px;
@@ -29,7 +30,7 @@
 
 }
 .info{
-    width: 265px;
+    width: 287px;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -43,7 +44,7 @@
     font-family: Roboto;
     font-style: normal;
     font-weight: normal;
-    font-size: 26px;
+    font-size: 25px;
     line-height: 30px;
     display: flex;
     align-items: center;
