@@ -1,6 +1,6 @@
 
 import Header from "../Header"
-import "./reset.css"
+import "../reset.css"
 import "./style.css"
 // import movie from ".../assets/EnolaHolmes.svg"
 

@@ -1,4 +1,4 @@
-import "./reset.css"
+import "../reset.css"
 import "./style.css"
 
 export default function Footer({URL,title,weekday,name}){

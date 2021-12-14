@@ -1,6 +1,6 @@
 import Header from "../Header"
 import Footer from "../Footer"
-import "./reset.css"
+import "../reset.css"
 import "./style.css"
 
 export default function SelectSeat() {
