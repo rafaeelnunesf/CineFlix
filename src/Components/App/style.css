@@ -1,0 +1,8 @@
+.page{
+    width: 375px;
+    height: 877px;
+    overflow-y: scroll;
+}
+::-webkit-scrollbar{
+    display: none;
+}
