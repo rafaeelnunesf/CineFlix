@@ -11,15 +11,17 @@ import Header from "../Header"
 
 export default function App() {
     const [idMovie,setIdMovie] = useState()
-    console.log(idMovie)
+    const [idSession, setIdSession] = useState()
+    
+    console.log(idSession)
     return(
         <div className="page">
             <BrowserRouter>
                 <Header/>
                 <Routes>
                     <Route path="/" element={<SelectMovie setIdMovie={setIdMovie}/>}/>
-                    <Route path={`/sessions/${idMovie}`} element={<SelectTime idMovie={idMovie}/>}/>
-                    <Route path="/seats" element={<SelectSeat/>}/>
+                    <Route path={`/sessions/${idMovie}`} element={<SelectTime idMovie={idMovie} setIdSession={setIdSession}/>}/>
+                    <Route path={`/seats/${idSession}`} element={<SelectSeat idSession={idSession}/>}/>
                     <Route path="/success" element={<Success/>}/>
                 </Routes>
             </BrowserRouter>

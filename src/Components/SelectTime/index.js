@@ -1,4 +1,3 @@
-import Header from "../Header"
 import Footer from "../Footer"
 import "../reset.css"
 import "./style.css"
@@ -6,7 +5,7 @@ import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 
-export default function SelectTime({idMovie}) {
+export default function SelectTime({idMovie,setIdSession}) {
     const [movie,setMovie] = useState()
 
 
@@ -18,21 +17,21 @@ export default function SelectTime({idMovie}) {
     }
 
 
-    useEffect(getSessions,[])
+    useEffect(getSessions,[idMovie])
     return(
         <>
             <h1>Selecione o horário</h1>
             <div className="sessions-times">
                 {movie===undefined?"":
-                    movie.days.map(day=>{
+                    movie.days.map(({id,weekday,date,showtimes})=>{
                         return(
                             <>
-                            <p>{day.weekday} - {day.date}</p>
+                            <p>{weekday} - {date}</p>
                             <div className="times">
-                                {day.showtimes.map(showtime=>{
+                                {showtimes.map(({name,id})=>{
                                     return(
-                                        <Link to="/select-seat">
-                                            <button className="time">{showtime.name}</button>
+                                        <Link to={`/seats/${id}`}>
+                                            <button className="time" onClick={()=>setIdSession(id)} >{name}</button>
                                         </Link>
                                     )
                                 })}
