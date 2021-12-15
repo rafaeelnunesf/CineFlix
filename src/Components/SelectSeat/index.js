@@ -7,17 +7,33 @@ import "./style.css"
 
 export default function SelectSeat({idSession}) {
     const [seats,setSeats] = useState()
+    const [isSelected,setIsSelected] = useState([])
 
 
     function getSeats() {
         const promiseSeats = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSession}/seats`)
         promiseSeats.then(answer=>{
-            console.log(answer.data)
             setSeats(answer.data)
         })
     }
-    useEffect(getSeats,[idSession])
+    
+    
+    function chooseSeat(id,isAvailable){
+        if(isSelected.includes(id)){
+            let array = [...isSelected]
+            array.splice(array.indexOf(id),1)
+            setIsSelected(array)
+            return
+        }
+        else if(id!==undefined && isAvailable === true){
+            setIsSelected([...isSelected,id])
+            return
+        }
+        alert('Esse assento não está disponível')
+    }
 
+
+    useEffect(getSeats,[idSession])
     return(
         <>
             <h1>Selecione o(s) assento(s)</h1>
@@ -26,7 +42,11 @@ export default function SelectSeat({idSession}) {
                 {seats === undefined?"" :
                     seats.seats.map(({id,name,isAvailable})=>{
                         return(
-                            <div className={`seat ${isAvailable === false ?'unavailable':''}`}>{name}</div>
+                            <div 
+                            className={`seat ${(isSelected.includes(id)) && "selected"} ${isAvailable === false ?'unavailable':''}`} 
+                            onClick={()=>chooseSeat(id,isAvailable)}>
+                                {name}
+                            </div>
                         )
                     })}
             </div>
