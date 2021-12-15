@@ -2,6 +2,7 @@ import Header from "../Header"
 import Footer from "../Footer"
 import "../reset.css"
 import "./style.css"
+import { Link } from "react-router-dom"
 
 export default function SelectSeat() {
     const seats =
@@ -276,7 +277,6 @@ export default function SelectSeat() {
 
     return(
         <>
-            <Header></Header>
             <h1>Selecione o(s) assento(s)</h1>
  
             <div className="seats">
@@ -312,7 +312,9 @@ export default function SelectSeat() {
             </div>
 
             <div className="reserve-seat">
-                <button>Reservar assento(s)</button>
+                <Link to="/success">
+                    <button>Reservar assento(s)</button>
+                </Link>
             </div>
             <Footer URL={seats.movie.posterURL} title={seats.movie.title} weekday={seats.day.weekday} name={seats.name}></Footer>
         </>

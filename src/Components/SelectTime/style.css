@@ -70,6 +70,8 @@ h1{
     align-items: center;
     justify-content: center;
     letter-spacing: 0.02em;
-    
     color: #FFFFFF;
+}
+a:-webkit-any-link {
+    text-decoration:none;
 }

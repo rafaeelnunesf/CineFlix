@@ -2,6 +2,7 @@ import Header from "../Header"
 import Footer from "../Footer"
 import "../reset.css"
 import "./style.css"
+import { Link } from "react-router-dom"
 
 export default function SelectTime() {
     const movie = 
@@ -136,7 +137,6 @@ export default function SelectTime() {
     }
     return(
         <>
-            <Header></Header>
             <h1>Selecione o horário</h1>
             <div className="sessions-times">
                 {movie.days.map(day=>{
@@ -146,7 +146,9 @@ export default function SelectTime() {
                         <div className="times">
                             {day.showtimes.map(showtime=>{
                                 return(
-                                    <button className="time">{showtime.name}</button>
+                                    <Link to="/select-seat">
+                                        <button className="time">{showtime.name}</button>
+                                    </Link>
                                 )
                             })}
                         </div>

@@ -1,4 +1,4 @@
-import Header from "../Header"
+import { Link } from "react-router-dom"
 import "../reset.css"
 import "./style.css"
 
@@ -49,8 +49,7 @@ export default function Success() {
             }
     return(
         <>
-            <Header></Header>
-            <h1>Pedido feito com sucesso!</h1>
+            <h1 className="request-success">Pedido feito com sucesso!</h1>
             <div className="movie-session">
                 Filme e sessão
                 <div>
@@ -76,7 +75,9 @@ export default function Success() {
                 </div>
             </div>
             <div className="back-home">
-                <button>Voltar pra Home</button>
+                <Link to="/">
+                    <button>Voltar pra Home</button>
+                </Link>
             </div>
         </>
     )

@@ -1,5 +1,6 @@
-
-import Header from "../Header"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import "../reset.css"
 import "./style.css"
 // import movie from ".../assets/EnolaHolmes.svg"
@@ -7,7 +8,7 @@ import "./style.css"
 
 export default function SelectMovie() {
 
-    const movies=[
+    /* const movies=[
         {
             id: 1,
             title: "2067",
@@ -22,18 +23,29 @@ export default function SelectMovie() {
             overview: "Jesse Freeman is a former special forces officer and explosives expert now working a regular job as a security guard in a state-of-the-art basketball arena. Trouble erupts when a tech-savvy cadre of terrorists kidnap the team's owner and Jesse's daughter during opening night. Facing a ticking clock and impossible odds, it's up to Jesse to not only save them but also a full house of fans in this highly charged action thriller.",
             releaseDate: "2020-09-29T00:00:00.000Z",
         }
-    ]
+    ] */
 
+    const [movies ,setMovies] = useState([])
 
+    // Dentro do use effect
+    useEffect(getMovies,[])
+    function getMovies() {
+        const promiseMovies = axios.get("https://mock-api.driven.com.br/api/v4/cineflex/movies")
+        promiseMovies.then(reposta=>(
+            setMovies(reposta.data)
+        ))
+    }
+    
     return(
         <>
-            <Header/>
             <h1>Selecione o filme</h1>
             <div className="movies">
                 {movies.map(({posterURL,title})=>{
                     return(
                         <div className="movie">
-                            <img src={posterURL} alt={title} />
+                            <Link to="/select-time">
+                                <img src={posterURL} alt={title} />
+                            </Link>
                         </div>
 
                     )
