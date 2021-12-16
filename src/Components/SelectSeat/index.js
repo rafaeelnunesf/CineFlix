@@ -5,9 +5,12 @@ import { useState, useEffect } from "react"
 import "../reset.css"
 import "./style.css"
 
-export default function SelectSeat({idSession}) {
+export default function SelectSeat({idSession,setUserData}) {
     const [seats,setSeats] = useState()
     const [isSelected,setIsSelected] = useState([])
+    const [nameSeat,setnameSeat] = useState([])
+    const [name, setName] = useState()
+    const [cpf, setCpf] = useState()
 
 
     function getSeats() {
@@ -17,21 +20,49 @@ export default function SelectSeat({idSession}) {
         })
     }
     
-    
-    function chooseSeat(id,isAvailable){
+    function chooseSeat(id,isAvailable,name){
         if(isSelected.includes(id)){
-            let array = [...isSelected]
-            array.splice(array.indexOf(id),1)
-            setIsSelected(array)
+            let arrayIds = [...isSelected]
+            let arrayNames = [...nameSeat]
+            arrayIds.splice(arrayIds.indexOf(id),1)
+            arrayNames.splice(arrayNames.indexOf(id),1)
+            setIsSelected(arrayIds)
+            setnameSeat(arrayNames)
             return
         }
         else if(id!==undefined && isAvailable === true){
             setIsSelected([...isSelected,id])
+            setnameSeat([...nameSeat,name])
             return
         }
         alert('Esse assento não está disponível')
     }
 
+    function sendDataUser() {
+        if(name===undefined){
+            alert('Por favor, digite seu nome')
+            return
+        }else if(cpf===undefined){
+            alert('Por favor, digite seu CPF')
+            return
+        }else if(isSelected.length===0){
+            alert('Por favor, escolha pelo menos 1 assento')
+            return
+        }
+        const objectPost = {ids:[...isSelected],name,cpf}
+        const requestSeats = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`,objectPost)  
+        requestSeats.catch((error)=> console.log("Mensagem de erro: " + error.response.data))
+
+        const finalOrder = {
+            ids:[...nameSeat],
+            name:name,
+            cpf:cpf, 
+            titleMovie:seats.movie.title, 
+            date:seats.day.date, 
+            nameSession:seats.name
+        }
+        setUserData(finalOrder)
+    }
 
     useEffect(getSeats,[idSession])
     return(
@@ -44,7 +75,7 @@ export default function SelectSeat({idSession}) {
                         return(
                             <div 
                             className={`seat ${(isSelected.includes(id)) && "selected"} ${isAvailable === false ?'unavailable':''}`} 
-                            onClick={()=>chooseSeat(id,isAvailable)}>
+                            onClick={()=>chooseSeat(id,isAvailable,name)}>
                                 {name}
                             </div>
                         )
@@ -67,18 +98,22 @@ export default function SelectSeat({idSession}) {
             <div className="data-user">
                 <div>
                     <h2>Nome do comprador:</h2>
-                    <input placeholder="Digite seu nome..."></input>
+                    <input placeholder="Digite seu nome..." onChange={(e) => setName(e.target.value)}></input>
                 </div>
                 <div>
                     <h2>CPF do comprador::</h2>
-                    <input placeholder="Digite seu CPF..."></input>
+                    <input placeholder="Digite seu CPF..." onChange={(e) => setCpf(e.target.value)}></input>
                 </div>
             </div>
 
             <div className="reserve-seat">
+                {(name===undefined||cpf===undefined||isSelected.length===0)
+                ?
+                <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>  
+                :
                 <Link to="/success">
-                    <button>Reservar assento(s)</button>
-                </Link>
+                    <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>
+                </Link>}
             </div>
             <Footer 
             URL={seats === undefined?"":seats.movie.posterURL} 

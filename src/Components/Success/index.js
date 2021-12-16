@@ -2,7 +2,8 @@ import { Link } from "react-router-dom"
 import "../reset.css"
 import "./style.css"
 
-export default function Success() {
+export default function Success({userData}) {
+    console.log(userData)
     const object =
         {
             "id": 1,
@@ -47,22 +48,31 @@ export default function Success() {
             name: "Fulano",
             cpf: "12345678900"
             }
+
+
+/* userData = 
+            cpf: undefined
+            date: "24/02/2022"
+            ids: []
+            name: undefined
+            nameSession: "15:00"
+            titleMovie: "Zack Snyder Justice League" */
     return(
         <>
             <h1 className="request-success">Pedido feito com sucesso!</h1>
             <div className="movie-session">
                 Filme e sessão
                 <div>
-                    <p>{object.movie.title}</p>
-                    <p>{`${object.day.date}  ${object.name}`}</p>
+                    <p>{userData.titleMovie}</p>
+                    <p>{`${userData.date}  ${userData.nameSession}`}</p>
                 </div>
             </div>
             <div className="tickets">
                 Ingressos
                 <div>
-                    {object.seats.map(item =>{
+                    {userData.ids.map(id =>{
                         return(
-                            <p>{`Assento ${item.id}`}</p>
+                            <p>{`Assento ${id}`}</p>
                         )
                     })}
                 </div>
@@ -70,8 +80,8 @@ export default function Success() {
             <div className="buyer">
                 Comprador
                 <div>
-                    <p>{`Nome: ${user.name}`}</p>
-                    <p>{`CPF: ${user.cpf}`}</p>
+                    <p>{`Nome: ${userData.name}`}</p>
+                    <p>{`CPF: ${userData.cpf}`}</p>
                 </div>
             </div>
             <div className="back-home">

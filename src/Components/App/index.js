@@ -12,8 +12,7 @@ import Header from "../Header"
 export default function App() {
     const [idMovie,setIdMovie] = useState()
     const [idSession, setIdSession] = useState()
-    
-    console.log(idSession)
+    const [userData, setUserData] = useState({ids:[],name:'',cpf:''})
     return(
         <div className="page">
             <BrowserRouter>
@@ -21,8 +20,8 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<SelectMovie setIdMovie={setIdMovie}/>}/>
                     <Route path={`/sessions/${idMovie}`} element={<SelectTime idMovie={idMovie} setIdSession={setIdSession}/>}/>
-                    <Route path={`/seats/${idSession}`} element={<SelectSeat idSession={idSession}/>}/>
-                    <Route path="/success" element={<Success/>}/>
+                    <Route path={`/seats/${idSession}`} element={<SelectSeat idSession={idSession} setUserData={setUserData}/>}/>
+                    <Route path="/success" element={<Success userData={userData}/>}/>
                 </Routes>
             </BrowserRouter>
         </div>
