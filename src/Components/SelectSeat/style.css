@@ -21,6 +21,10 @@ h1{
     
     color: #293845;
 }
+.data-users{
+    overflow: scroll;
+    min-height: 160px;
+}
 .data-user{
     box-sizing: border-box;
     padding: 0 25px;
@@ -28,6 +32,7 @@ h1{
     justify-content: flex-start;
     flex-direction: column;
     gap:7px;
+
 }
 h2{
     width: 100%;
@@ -63,6 +68,7 @@ input{
 .reserve-seat {
     width: 100%;
     height: 130px;
+    min-height: 60px;
     display: flex;
 
     flex-direction: column;

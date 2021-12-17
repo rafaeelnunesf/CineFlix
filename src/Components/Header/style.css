@@ -16,3 +16,8 @@
     background: #C3CFD9;
     color: #E8833A;
 }
+.go-back{
+    position: absolute;
+    left: 25px;
+    font-size: 40px;
+}

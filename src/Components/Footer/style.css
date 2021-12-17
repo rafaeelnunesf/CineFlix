@@ -33,7 +33,7 @@
     width: 287px;
     display: flex;
     flex-direction: column;
-    text-align: center;
+    text-align:start;
     justify-content: center;
 }
 .info p{
@@ -42,8 +42,6 @@
     bottom: 39px;
     
     font-family: Roboto;
-    font-style: normal;
-    font-weight: normal;
     font-size: 25px;
     line-height: 30px;
     display: flex;

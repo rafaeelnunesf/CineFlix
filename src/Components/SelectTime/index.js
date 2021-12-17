@@ -1,29 +1,25 @@
-import Footer from "../Footer"
-import "../reset.css"
-import "./style.css"
 import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import "../reset.css"
+import "./style.css"
+import Footer from "../Footer"
 
 export default function SelectTime({idMovie,setIdSession}) {
     const [movie,setMovie] = useState()
-
-
     function getSessions() {
         const promiseMovie = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/movies/${idMovie}/showtimes`)
         promiseMovie.then(answer=>{
             setMovie(answer.data)
         })
     }
-
-
     useEffect(getSessions,[idMovie])
     return(
         <>
             <h1>Selecione o horário</h1>
             <div className="sessions-times">
                 {movie===undefined?"":
-                    movie.days.map(({id,weekday,date,showtimes})=>{
+                    movie.days.map(({weekday,date,showtimes})=>{
                         return(
                             <>
                             <p>{weekday} - {date}</p>
