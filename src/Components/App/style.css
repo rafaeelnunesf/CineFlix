@@ -19,3 +19,7 @@ a:-webkit-any-link {
     cursor: pointer;
     text-decoration: none;
 }
+@keyframes icon {
+    0% { transform: rotate(0) }
+    100% { transform: rotate(360deg) }
+}
