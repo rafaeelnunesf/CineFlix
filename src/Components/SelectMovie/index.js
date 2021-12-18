@@ -1,6 +1,7 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import Loading from "../Loading"
 import "../reset.css"
 import "./style.css"
 
@@ -14,7 +15,11 @@ export default function SelectMovie({setIdMovie}) {
             ))
         }
     useEffect(getMovies,[])
-    
+    if(movies.length===0){
+        return(
+            <Loading/>
+        )
+    }
     return(
         <>
             <h1>Selecione o filme</h1>

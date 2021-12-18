@@ -6,12 +6,13 @@ import "../reset.css"
 import "./style.css"
 
 import Footer from "../Footer"
+import Loading from "../Loading"
 
 export default function SelectSeat({idSession,setUserData}) {
     const [seats,setSeats] = useState()
     const [isSelected,setIsSelected] = useState([])
     const [nameSeat,setnameSeat] = useState([])   
-    const [buyers,setBuyers] = useState({ids: [...isSelected],compradores: []})
+    const [buyers,setBuyers] = useState({ids: [...nameSeat],compradores: []})
 
     function getSeats() {
         const promiseSeats = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSession}/seats`)
@@ -21,6 +22,8 @@ export default function SelectSeat({idSession,setUserData}) {
     }
     
     function chooseSeat(id,isAvailable,name){
+        console.log(id)
+        console.log(name)
         if(isSelected.includes(id)){
             let arrayIds = [...isSelected]
             let arrayNames = [...nameSeat]
@@ -28,13 +31,13 @@ export default function SelectSeat({idSession,setUserData}) {
             arrayNames.splice(arrayNames.indexOf(id),1)
             setIsSelected(arrayIds)
             setnameSeat(arrayNames)
-            setBuyers({ids: [arrayIds],compradores: []})
+            setBuyers({ids: [arrayNames],compradores: []})
             return
         }
         else if(id!==undefined && isAvailable === true){
             setIsSelected([...isSelected,id])
             setnameSeat([...nameSeat,name])
-            setBuyers({ids: [...isSelected,id],compradores: []})
+            setBuyers({ids: [...nameSeat,name],compradores: []})
             return
         }
         alert('Esse assento não está disponível')
@@ -52,8 +55,8 @@ export default function SelectSeat({idSession,setUserData}) {
                 return
             }
         }
-        const requestSeats = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`,buyers)  
-        requestSeats.catch((error)=> console.log("Mensagem de erro: " + error.response.data))
+        /* const requestSeats = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`,buyers)  
+        requestSeats.catch((error)=> console.log("Mensagem de erro: " + error.response.data)) */
 
         const finalOrder = {
             buyers:buyers.compradores, 
@@ -65,6 +68,12 @@ export default function SelectSeat({idSession,setUserData}) {
     }
 
     useEffect(getSeats,[idSession])
+
+    if(seats===undefined){
+        return(
+            <Loading/>
+        )
+    }
     return(
         <>
             <h1>Selecione o(s) assento(s)</h1>
@@ -81,7 +90,7 @@ export default function SelectSeat({idSession,setUserData}) {
                     })}
             </div>
             <TypeSeats/>
-            <DataUsers isSelected={isSelected} buyers={buyers}setBuyers={setBuyers}/>
+            <DataUsers nameSeat={nameSeat} buyers={buyers}setBuyers={setBuyers}/>
 
             <div className="reserve-seat">
                 {/* {/* (name===undefined||cpf===undefined||isSelected.length===0)
@@ -101,6 +110,48 @@ export default function SelectSeat({idSession,setUserData}) {
         </>
     )
 }
+function DataUsers({nameSeat, buyers,setBuyers}) {
+    let arrayEmpty = []
+    const newArray = buyers
+    console.log(buyers)
+    function usersName(name,i){
+        arrayEmpty[i].nome = name 
+        newArray.compradores = arrayEmpty
+        setBuyers(newArray)
+    }
+    function usersCpf(cpf,i){
+        arrayEmpty[i].cpf = cpf 
+        newArray.compradores = arrayEmpty
+        setBuyers(newArray)
+    }
+    
+    if(nameSeat.length===0){
+        return(
+            <h1>Selecione 1 assento</h1>
+        )
+    }
+    
+    return(
+        <>
+        <div className="data-users">
+            {nameSeat.map((item,i)=>{
+                arrayEmpty[i]={ idAssento: item, nome:'' , cpf:''  }
+                return(
+                <div className="data-user">
+                        <div>
+                            <h2>{`Nome do ${i+1}° comprador:`}</h2>
+                            <input placeholder="Digite seu nome..." onChange={(e) => usersName(e.target.value,i)}></input>
+                        </div>
+                        <div>
+                            <h2>{`CPF do ${i+1}° comprador:`}</h2>
+                            <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e.target.value,i)}></input>
+                        </div>
+                    </div>
+            )})}
+        </div>
+        </>
+    )
+}
 function TypeSeats() {
     return(
         <div className="type-seats">  
@@ -117,47 +168,5 @@ function TypeSeats() {
                     Indisponível
                 </div>    
             </div>
-    )
-}
-function DataUsers({isSelected, buyers,setBuyers}) {
-    let arrayEmpty = []
-    const newArray = buyers
-
-    function usersName(name,i){
-        arrayEmpty[i].nome = name //nao apagar
-        newArray.compradores = arrayEmpty
-        setBuyers(newArray)
-    }
-    function usersCpf(cpf,i){
-        arrayEmpty[i].cpf = cpf //nao apagar
-        newArray.compradores = arrayEmpty
-        setBuyers(newArray)
-    }
-
-    if(isSelected.length===0){
-        return(
-            <h1>Selecione 1 assento</h1>
-        )
-    }
-    
-    return(
-        <>
-        <div className="data-users">
-            {isSelected.map((item,i)=>{
-                arrayEmpty[i]={ idAssento: item, nome:'' , cpf:''  }
-                return(
-                <div className="data-user">
-                        <div>
-                            <h2>{`Nome do ${i+1}° comprador:`}</h2>
-                            <input placeholder="Digite seu nome..." onChange={(e) => usersName(e.target.value,i)}></input>
-                        </div>
-                        <div>
-                            <h2>{`CPF do ${i+1}° comprador:`}</h2>
-                            <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e.target.value,i)}></input>
-                        </div>
-                    </div>
-            )})}
-        </div>
-        </>
     )
 }

@@ -4,6 +4,7 @@ import axios from "axios"
 import "../reset.css"
 import "./style.css"
 import Footer from "../Footer"
+import Loading from "../Loading"
 
 export default function SelectTime({idMovie,setIdSession}) {
     const [movie,setMovie] = useState()
@@ -14,6 +15,11 @@ export default function SelectTime({idMovie,setIdSession}) {
         })
     }
     useEffect(getSessions,[idMovie])
+    if(movie===undefined){
+        return(
+            <Loading/>
+        )
+    }
     return(
         <>
             <h1>Selecione o horário</h1>
