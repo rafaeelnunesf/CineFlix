@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import styled from 'styled-components';
 import axios from "axios"
 
 import "../reset.css"
-import "./style.css"
 
 import Footer from "../Footer"
 import Loading from "../Loading"
@@ -20,7 +20,8 @@ export default function SelectSeat({idSession,setUserData}) {
             setSeats(answer.data)
         })
     }
-    
+    useEffect(getSeats,[idSession])
+
     function chooseSeat(id,isAvailable,name){
         console.log(id)
         console.log(name)
@@ -55,6 +56,7 @@ export default function SelectSeat({idSession,setUserData}) {
                 return
             }
         }
+        // Descomentar esse bloco pra fazer as requests pra API
         /* const requestSeats = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`,buyers)  
         requestSeats.catch((error)=> console.log("Mensagem de erro: " + error.response.data)) */
 
@@ -67,8 +69,6 @@ export default function SelectSeat({idSession,setUserData}) {
         setUserData(finalOrder)
     }
 
-    useEffect(getSeats,[idSession])
-
     if(seats===undefined){
         return(
             <Loading/>
@@ -76,37 +76,36 @@ export default function SelectSeat({idSession,setUserData}) {
     }
     return(
         <>
-            <h1>Selecione o(s) assento(s)</h1>
-            <div className="seats">
-                {seats === undefined?"" :
-                    seats.seats.map(({id,name,isAvailable})=>{
+            <SelectSeatH1>Selecione o(s) assento(s)</SelectSeatH1>
+            <Seats>
+                {seats.seats.map(({id,name,isAvailable})=>{
                         return(
-                            <div 
-                            className={`seat ${(isSelected.includes(id)) && "selected"} ${isAvailable === false ?'unavailable':''}`} 
+                            <Seat 
+                            className={`${(isSelected.includes(id)) && "selected"} ${isAvailable === false &&'unavailable'}`} 
                             onClick={()=>chooseSeat(id,isAvailable,name)}>
                                 {name}
-                            </div>
+                            </Seat>
                         )
                     })}
-            </div>
+            </Seats>
             <TypeSeats/>
             <DataUsers nameSeat={nameSeat} buyers={buyers}setBuyers={setBuyers}/>
 
-            <div className="reserve-seat">
+            <ReserveSeat>
                 {/* {/* (name===undefined||cpf===undefined||isSelected.length===0)
                 ?
                 <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>  
                 :*/
                 <Link to="/success">
-                    <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>
+                    <Button onClick={()=> sendDataUser()}>Reservar assento(s)</Button>
                 </Link>}
                 {/* <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>  */}
-            </div>
+            </ReserveSeat> 
             <Footer
-            URL={seats === undefined?"":seats.movie.posterURL} 
-            title={seats === undefined?"":seats.movie.title} 
-            weekday={seats === undefined?"":seats.day.weekday} 
-            name={seats === undefined?"":seats.name}></Footer>
+            URL={seats.movie.posterURL} 
+            title={seats.movie.title} 
+            weekday={seats.day.weekday} 
+            name={seats.name}></Footer>
         </>
     )
 }
@@ -127,46 +126,219 @@ function DataUsers({nameSeat, buyers,setBuyers}) {
     
     if(nameSeat.length===0){
         return(
-            <h1>Selecione 1 assento</h1>
+            <SelectSeatH1>Selecione 1 assento</SelectSeatH1>
         )
     }
     
     return(
         <>
-        <div className="data-users">
+        <DataUsersContainer>
             {nameSeat.map((item,i)=>{
                 arrayEmpty[i]={ idAssento: item, nome:'' , cpf:''  }
                 return(
-                <div className="data-user">
-                        <div>
-                            <h2>{`Nome do ${i+1}° comprador:`}</h2>
-                            <input placeholder="Digite seu nome..." onChange={(e) => usersName(e.target.value,i)}></input>
-                        </div>
-                        <div>
-                            <h2>{`CPF do ${i+1}° comprador:`}</h2>
-                            <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e.target.value,i)}></input>
-                        </div>
+                <DataUser>
+                    <div>
+                        <h2>{`Nome do ${i+1}° comprador:`}</h2>
+                        <input placeholder="Digite seu nome..." onChange={(e) => usersName(e.target.value,i)}></input>
                     </div>
+                    <div>
+                        <h2>{`CPF do ${i+1}° comprador:`}</h2>
+                        <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e.target.value,i)}></input>
+                    </div>
+                </DataUser>
             )})}
-        </div>
+        </DataUsersContainer>
         </>
     )
 }
 function TypeSeats() {
+    const typeSeat = [
+        {type:'selected',name:'Selecionado'},
+        {type:'available',name:'Disponível'},
+        {type:'unavailable',name:'Indisponível'}]
     return(
-        <div className="type-seats">  
-                <div className="type-selected">
-                    <div className="seat selected"></div>
-                    Selecionado
-                </div>
-                <div className="type-available">
-                    <div className="seat"></div>
-                    Disponível
-                </div>
-                <div className="type-unavailable">
-                    <div className="seat unavailable"></div>
-                    Indisponível
-                </div>    
-            </div>
+        <TypeSeatsContainer>
+            {typeSeat.map(({type,name})=>(
+                <TypeSeat>
+                    <Seat className={type}></Seat>
+                    {name}
+                </TypeSeat>
+            ))}
+        </TypeSeatsContainer>
     )
 }
+
+
+const SelectSeatH1 = styled.div`
+    width: 100%;
+    min-height: 102px;
+    margin-bottom: 11px;
+
+    position: sticky;
+    top: 67px;
+    
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+
+    font-size: 24px;
+    line-height: 28px;
+    letter-spacing: 0.04em;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFFFFF;
+    
+    color: #293845;
+`;
+const DataUsersContainer = styled.div`
+    overflow: scroll;
+    min-height: 160px;
+`
+const DataUser = styled.div`
+    box-sizing: border-box;
+    padding: 0 25px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap:7px;
+    input{
+    width: 100%;
+    height: 51px;
+
+    box-sizing: border-box;
+    padding-left: 18px;
+
+    font-family: Roboto;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 21px;
+    
+    color: #AFAFAF;
+    background: #FFFFFF;
+
+    border: 1px solid #D5D5D5;
+    border-radius: 3px;
+    }
+    h2{
+    width: 100%;
+    height: 25px;
+    
+    font-family: Roboto;
+    font-size: 18px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    
+    color: #293845;
+    }
+    `
+const ReserveSeat = styled.div`
+    width: 100%;
+    height: 130px;
+    min-height: 60px;
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    `
+
+const Button = styled.button`
+    width: 225px;
+    height: 42px;
+    
+    
+    border-radius: 3px;
+    border: 0;
+    
+    font-family: Roboto;
+    font-size: 18px;
+    line-height: 21px;
+    letter-spacing: 0.04em;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    color: #FFFFFF;
+    background: #E8833A;
+    `
+const Input = styled.input`
+
+`
+const Seats = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    box-sizing: border-box;
+    padding: 0 25px;
+`
+
+const Seat = styled.div`
+    width: 26px;
+    height: 26px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    box-sizing: border-box;
+    border-radius: 12px;
+
+    margin-bottom: 11px;
+    
+    font-family: Roboto;
+    font-size: 11px;
+    line-height: 13px;
+    letter-spacing: 0.04em;
+    
+    border: 1px solid #808F9D;
+    background: #C3CFD9;
+    color: #000000;
+    
+    
+    &.selected{
+        width: 26px;
+        height: 26px;
+        background: #8DD7CF;
+        border: 1px solid #45BDB0;
+    }
+    &available{
+        max-width: 26px;
+        height: 26px;
+        background: #C3CFD9;
+        border: 1px solid #808F9D;
+    }
+    &.unavailable{
+        width: 26px;
+        height: 26px;
+        background: #FBE192;
+        border: 1px solid #F7C52B;
+    }
+    `
+const TypeSeat = styled.div`
+    width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+
+    font-family: Roboto;
+    font-size: 13px;
+    line-height: 15px;
+    letter-spacing: -0.013em;
+
+    color: #4E5A65;
+
+
+`
+
+const TypeSeatsContainer = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap:25px;
+    margin-bottom: 40px;
+`
