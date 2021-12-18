@@ -178,9 +178,6 @@ const SelectSeatH1 = styled.div`
     top: 67px;
     
     font-family: Roboto;
-    font-style: normal;
-    font-weight: normal;
-
     font-size: 24px;
     line-height: 28px;
     letter-spacing: 0.04em;
@@ -265,9 +262,6 @@ const Button = styled.button`
     color: #FFFFFF;
     background: #E8833A;
     `
-const Input = styled.input`
-
-`
 const Seats = styled.div`
     display: flex;
     flex-wrap: wrap;

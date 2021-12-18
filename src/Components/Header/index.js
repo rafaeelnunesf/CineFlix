@@ -1,16 +1,42 @@
 import { useNavigate,useLocation } from "react-router";
+import styled from "styled-components";
+
 import "../reset.css"
-import "./style.css"
+
 export default function Header() {
     const goBack = useNavigate();
     const location = useLocation()
     return(
-        <div className="header">
+        <Container>
             {location.pathname !== "/" &&
-                <div className="go-back" onClick={()=>goBack(-1)}>
+                <GoBack onClick={()=>goBack(-1)}>
                     <ion-icon name="arrow-undo-sharp"></ion-icon>
-                </div>}
+                </GoBack>}
             CINEFLIX
-        </div>  
+        </Container>  
     )
-}
+} 
+
+const Container = styled.div`
+    width: 100%;
+    min-height: 67px;
+
+    position: sticky;
+    top: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-family: Roboto;  
+    font-size: 34px;
+    line-height: 40px;
+    
+    background: #C3CFD9;
+    color: #E8833A;
+`
+const GoBack = styled.div`
+    position: absolute;
+    left: 25px;
+    font-size: 40px;
+`

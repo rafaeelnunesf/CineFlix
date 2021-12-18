@@ -1,5 +1,6 @@
-import styled from "styled-components"
 import "../reset.css"
+import styled from "styled-components"
+import { keyframes } from "styled-components"
 
 export default function Loading(){
     return(
@@ -13,7 +14,10 @@ export default function Loading(){
         </>
     )
 }
-
+const rotation = keyframes`
+    0% { transform: rotate(0) }
+    100% { transform: rotate(360deg) }
+`
 const H1loading = styled.h1`
     width: 100%;
     min-height: 102px;
@@ -65,7 +69,7 @@ const Icon = styled.div`
     border-radius: 50%;
     border: 12px solid #000;
     border-color: #e8833a transparent #e8833a transparent;
-    animation: icon 1.1111111111111112s linear infinite;
+    animation: ${rotation} 1.1111111111111112s linear infinite;
 }
     & > div:nth-child(2) { border-color: transparent }
     & > div:nth-child(2) div {

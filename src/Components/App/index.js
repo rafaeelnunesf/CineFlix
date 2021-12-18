@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { useState } from "react"
+import styled from "styled-components"
 
 import "../reset.css"
-import "./style.css"
 
 import SelectMovie from "../SelectMovie"
 import SelectTime from "../SelectTime"
@@ -15,7 +15,7 @@ export default function App() {
     const [idSession, setIdSession] = useState()
     const [userData, setUserData] = useState({ids:[],name:'',cpf:''})
     return(
-        <div className="page">
+        <Page>
             <BrowserRouter>
                 <Header/>
                 <Routes>
@@ -25,6 +25,22 @@ export default function App() {
                     <Route path="/success" element={<Success userData={userData}/>}/>
                 </Routes>
             </BrowserRouter>
-        </div>
+        </Page>
     )
 }
+const Page = styled.div`
+    width: 375px;
+    height: 877px;
+    overflow-y: scroll;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    ::-webkit-scrollbar{
+        display: none;
+    }
+    a:-webkit-any-link {
+        color: -webkit-link;
+        cursor: pointer;
+        text-decoration: none;
+    }
+`

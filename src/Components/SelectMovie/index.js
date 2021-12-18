@@ -14,14 +14,12 @@ export default function SelectMovie({setIdMovie}) {
         const promiseMovies = axios.get("https://mock-api.driven.com.br/api/v4/cineflex/movies")
         promiseMovies.then(reposta=>(
             setMovies(reposta.data)
-            ))
-        }
-    useEffect(getMovies,[])
-    if(movies.length===0){
+        ))}
+        useEffect(getMovies,[])
+        if(movies.length===0){
         return(
             <Loading/>
-        )
-    }
+        )}
     return(
         <>
             <SelectMovieH1>Selecione o filme</SelectMovieH1>
