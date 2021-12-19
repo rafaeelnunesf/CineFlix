@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import styled from 'styled-components';
 import axios from "axios"
 
@@ -13,7 +13,9 @@ export default function SelectSeat({idSession,setUserData}) {
     const [isSelected,setIsSelected] = useState([])
     const [nameSeat,setnameSeat] = useState([])   
     const [buyers,setBuyers] = useState({ids: [...nameSeat],compradores: []})
+    const [hasEmpty, setHasEmpty] = useState(true)
 
+    let goToSuccess = useNavigate();
     function getSeats() {
         const promiseSeats = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSession}/seats`)
         promiseSeats.then(answer=>{
@@ -23,31 +25,34 @@ export default function SelectSeat({idSession,setUserData}) {
     useEffect(getSeats,[idSession])
 
     function chooseSeat(id,isAvailable,name){
-        console.log(id)
-        console.log(name)
         if(isSelected.includes(id)){
             let arrayIds = [...isSelected]
             let arrayNames = [...nameSeat]
+
             arrayIds.splice(arrayIds.indexOf(id),1)
             arrayNames.splice(arrayNames.indexOf(id),1)
+
             setIsSelected(arrayIds)
             setnameSeat(arrayNames)
-            setBuyers({ids: [arrayNames],compradores: []})
+            setBuyers({ids: [arrayNames],compradores: [...buyers.compradores]})
             return
         }
         else if(id!==undefined && isAvailable === true){
             setIsSelected([...isSelected,id])
             setnameSeat([...nameSeat,name])
-            setBuyers({ids: [...nameSeat,name],compradores: []})
+            setBuyers({ids: [...nameSeat,name],compradores: [...buyers.compradores,{ idAssento: name, nome:'' , cpf:''  }]})
             return
         }
         alert('Esse assento não está disponível')
     }
 
     function sendDataUser() {
-        console.log(buyers.compradores)
         if(isSelected.length===0){
             alert('Por favor, escolha pelo menos 1 assento')
+            return
+        }
+        if(buyers.compradores.length===0){
+            alert('Por favor, preencha os campos de nome e cpf')
             return
         }
         for(let i = 0; i < buyers.compradores.length; i++ ){
@@ -67,6 +72,9 @@ export default function SelectSeat({idSession,setUserData}) {
             nameSession:seats.name
         }
         setUserData(finalOrder)
+        if(!hasEmpty){
+            goToSuccess("/success")
+        }
     }
 
     if(seats===undefined){
@@ -74,6 +82,7 @@ export default function SelectSeat({idSession,setUserData}) {
             <Loading/>
         )
     }
+    
     return(
         <>
             <SelectSeatH1>Selecione o(s) assento(s)</SelectSeatH1>
@@ -89,17 +98,9 @@ export default function SelectSeat({idSession,setUserData}) {
                     })}
             </Seats>
             <TypeSeats/>
-            <DataUsers nameSeat={nameSeat} buyers={buyers}setBuyers={setBuyers}/>
-
+            <DataUsers nameSeat={nameSeat} buyers={buyers}setBuyers={setBuyers} setHasEmpty={setHasEmpty}/>
             <ReserveSeat>
-                {/* {/* (name===undefined||cpf===undefined||isSelected.length===0)
-                ?
-                <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>  
-                :*/
-                <Link to="/success">
-                    <Button onClick={()=> sendDataUser()}>Reservar assento(s)</Button>
-                </Link>}
-                {/* <button onClick={()=> sendDataUser()}>Reservar assento(s)</button>  */}
+                <Button onClick={()=> sendDataUser()} hasEmpty={hasEmpty}>Reservar assento(s)</Button>  
             </ReserveSeat> 
             <Footer
             URL={seats.movie.posterURL} 
@@ -109,41 +110,52 @@ export default function SelectSeat({idSession,setUserData}) {
         </>
     )
 }
-function DataUsers({nameSeat, buyers,setBuyers}) {
-    let arrayEmpty = []
+function DataUsers({nameSeat, buyers,setBuyers,setHasEmpty}) {
     const newArray = buyers
-    console.log(buyers)
-    function usersName(name,i){
-        arrayEmpty[i].nome = name 
-        newArray.compradores = arrayEmpty
+ 
+    function usersName(e,i){
+        const name = e.target.value
+        newArray.compradores[i].nome = name
         setBuyers(newArray)
+        hasEmptyFields()
     }
-    function usersCpf(cpf,i){
-        arrayEmpty[i].cpf = cpf 
-        newArray.compradores = arrayEmpty
+    function usersCpf(e,i){
+        const cpf = e.target.value
+        newArray.compradores[i].cpf = cpf
         setBuyers(newArray)
+        hasEmptyFields() 
     }
-    
+    function hasEmptyFields(){
+        let array = []
+        for(let i = 0; i < buyers.compradores.length;i++){
+            if(buyers.compradores[i].nome !== '' && buyers.compradores[i].cpf!==''){
+                array.push(i+1)
+            }
+        }
+        if(buyers.compradores.length === array.length){
+            setHasEmpty(false)
+        }else if (array.length<buyers.compradores.length){
+            setHasEmpty(true)
+        } 
+    }
+
     if(nameSeat.length===0){
         return(
-            <SelectSeatH1>Selecione 1 assento</SelectSeatH1>
-        )
-    }
-    
+        <SelectSeatH1>Selecione 1 assento</SelectSeatH1>
+    )}
     return(
         <>
         <DataUsersContainer>
             {nameSeat.map((item,i)=>{
-                arrayEmpty[i]={ idAssento: item, nome:'' , cpf:''  }
                 return(
                 <DataUser>
                     <div>
                         <h2>{`Nome do ${i+1}° comprador:`}</h2>
-                        <input placeholder="Digite seu nome..." onChange={(e) => usersName(e.target.value,i)}></input>
+                        <input placeholder="Digite seu nome..." onChange={(e) => usersName(e,i)}></input>
                     </div>
                     <div>
                         <h2>{`CPF do ${i+1}° comprador:`}</h2>
-                        <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e.target.value,i)}></input>
+                        <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e,i)}></input>
                     </div>
                 </DataUser>
             )})}
@@ -192,6 +204,9 @@ const SelectSeatH1 = styled.div`
 const DataUsersContainer = styled.div`
     overflow: scroll;
     min-height: 160px;
+    box-shadow: 0 0 20px #dadada;
+    box-sizing: border-box;
+    padding: 8px 0;
 `
 const DataUser = styled.div`
     box-sizing: border-box;
@@ -246,7 +261,6 @@ const Button = styled.button`
     width: 225px;
     height: 42px;
     
-    
     border-radius: 3px;
     border: 0;
     
@@ -260,6 +274,8 @@ const Button = styled.button`
     justify-content: center;
     
     color: #FFFFFF;
+    opacity: ${({hasEmpty})=>hasEmpty?0.5:1};
+    cursor: ${({hasEmpty})=>hasEmpty?'not-allowed':'pointer'};
     background: #E8833A;
     `
 const Seats = styled.div`

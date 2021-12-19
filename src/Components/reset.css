@@ -46,3 +46,10 @@ table {
     border-collapse: collapse;
 	border-spacing: 0;
 }
+::-webkit-scrollbar{
+	display: none;
+}
+a:-webkit-any-link {
+	color: -webkit-link;
+	text-decoration: none;
+}

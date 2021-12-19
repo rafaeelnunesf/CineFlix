@@ -4,7 +4,6 @@ import styled from "styled-components"
 import "../reset.css"
 
 export default function Success({userData}) {
-    console.log(userData)
     let backHome = useNavigate();
     return(
         <>
