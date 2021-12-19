@@ -12,8 +12,10 @@ export default function SelectSeat({idSession,setUserData}) {
     const [seats,setSeats] = useState()
     const [isSelected,setIsSelected] = useState([])
     const [nameSeat,setnameSeat] = useState([])   
-    const [buyers,setBuyers] = useState({ids: [...nameSeat],compradores: []})
+    const [buyers,setBuyers] = useState({ids: [...isSelected],compradores: []})
     const [hasEmpty, setHasEmpty] = useState(true)
+
+    const [wasClicked,setWasClicked] = useState(false)
 
     let goToSuccess = useNavigate();
     function getSeats() {
@@ -28,43 +30,40 @@ export default function SelectSeat({idSession,setUserData}) {
         if(isSelected.includes(id)){
             let arrayIds = [...isSelected]
             let arrayNames = [...nameSeat]
+            let arrayCompradores = [...buyers.compradores]
 
             arrayIds.splice(arrayIds.indexOf(id),1)
             arrayNames.splice(arrayNames.indexOf(id),1)
+            arrayCompradores.splice(arrayCompradores.indexOf(id),1)
 
             setIsSelected(arrayIds)
             setnameSeat(arrayNames)
-            setBuyers({ids: [arrayNames],compradores: [...buyers.compradores]})
+            setBuyers({ids: [arrayNames],compradores: arrayCompradores})
             return
         }
         else if(id!==undefined && isAvailable === true){
             setIsSelected([...isSelected,id])
             setnameSeat([...nameSeat,name])
-            setBuyers({ids: [...nameSeat,name],compradores: [...buyers.compradores,{ idAssento: name, nome:'' , cpf:''  }]})
+            setBuyers({ids: [...isSelected,id],compradores: [...buyers.compradores,{ idAssento: name, nome:'' , cpf:''  }]})
             return
         }
-        alert('Esse assento não está disponível')
     }
-
-    function sendDataUser() {
-        if(isSelected.length===0){
-            alert('Por favor, escolha pelo menos 1 assento')
-            return
-        }
-        if(buyers.compradores.length===0){
-            alert('Por favor, preencha os campos de nome e cpf')
+    function checkData() {
+        setWasClicked(true)
+        if(buyers.compradores.length===0||isSelected.length===0){
             return
         }
         for(let i = 0; i < buyers.compradores.length; i++ ){
             if(buyers.compradores[i].nome === '' ||buyers.compradores[i].cpf === ''){
-                alert(`Por favor, preencha todos os campos para o ${i+1}° comprador`)
                 return
             }
         }
-        // Descomentar esse bloco pra fazer as requests pra API
-        /* const requestSeats = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`,buyers)  
-        requestSeats.catch((error)=> console.log("Mensagem de erro: " + error.response.data)) */
-
+        const requestSeats = axios.post(`https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many`,buyers)  
+        requestSeats.then((answer)=> console.log("Mensagem: " + answer.data))
+        requestSeats.catch((error)=> console.log("Mensagem de erro: " + error.response.status))
+    }
+    function sendDataUser() {
+        checkData()
         const finalOrder = {
             buyers:buyers.compradores, 
             titleMovie:seats.movie.title, 
@@ -82,7 +81,6 @@ export default function SelectSeat({idSession,setUserData}) {
             <Loading/>
         )
     }
-    
     return(
         <>
             <SelectSeatH1>Selecione o(s) assento(s)</SelectSeatH1>
@@ -98,7 +96,13 @@ export default function SelectSeat({idSession,setUserData}) {
                     })}
             </Seats>
             <TypeSeats/>
-            <DataUsers nameSeat={nameSeat} buyers={buyers}setBuyers={setBuyers} setHasEmpty={setHasEmpty}/>
+            <DataUsers 
+                nameSeat={nameSeat}
+                buyers={buyers} setBuyers={setBuyers}
+                seats={seats.seats}
+                setHasEmpty={setHasEmpty}
+                wasClicked={wasClicked} setWasClicked={setWasClicked}>
+            </DataUsers>
             <ReserveSeat>
                 <Button onClick={()=> sendDataUser()} hasEmpty={hasEmpty}>Reservar assento(s)</Button>  
             </ReserveSeat> 
@@ -110,13 +114,14 @@ export default function SelectSeat({idSession,setUserData}) {
         </>
     )
 }
-function DataUsers({nameSeat, buyers,setBuyers,setHasEmpty}) {
+function DataUsers({nameSeat, buyers,seats,setBuyers, setHasEmpty,wasClicked,setWasClicked}) {
     const newArray = buyers
  
     function usersName(e,i){
         const name = e.target.value
         newArray.compradores[i].nome = name
         setBuyers(newArray)
+        setWasClicked(false)
         hasEmptyFields()
     }
     function usersCpf(e,i){
@@ -138,24 +143,42 @@ function DataUsers({nameSeat, buyers,setBuyers,setHasEmpty}) {
             setHasEmpty(true)
         } 
     }
-
     if(nameSeat.length===0){
         return(
-        <SelectSeatH1>Selecione 1 assento</SelectSeatH1>
+            <>
+            {seats.some(item=> item.isAvailable===true)
+            ?
+            <SelectSeatH1>Selecione 1 assento</SelectSeatH1>
+            :
+            <SelectSeatH1>Não há assentos disponíveis</SelectSeatH1>
+            }
+            </>
     )}
     return(
         <>
         <DataUsersContainer>
             {nameSeat.map((item,i)=>{
                 return(
-                <DataUser>
+                <DataUser wasClicked={wasClicked}>
                     <div>
                         <h2>{`Nome do ${i+1}° comprador:`}</h2>
-                        <input placeholder="Digite seu nome..." onChange={(e) => usersName(e,i)}></input>
+                        <input 
+                            placeholder={`${wasClicked?'Por favor, insira um nome':"Digite seu nome..."}`} 
+                            className={`
+                            ${(buyers.compradores[i].nome!=='')?'isFilled':'isNotFilled'} 
+                            ${(wasClicked)?'wasClicked':'wasNotClicked'}`}
+                            onChange={(e) => usersName(e,i)}>
+                        </input>
                     </div>
                     <div>
                         <h2>{`CPF do ${i+1}° comprador:`}</h2>
-                        <input placeholder="Digite seu CPF..." onChange={(e) => usersCpf(e,i)}></input>
+                        <input 
+                            placeholder={`${wasClicked?'Por favor, insira um CPF':"Digite seu CPF..."}`}
+                            className={`
+                            ${(buyers.compradores[i].cpf!=='')?'isFilled':'isNotFilled'} 
+                            ${(wasClicked)?'wasClicked':'wasNotClicked'}`}
+                            onChange={(e) => usersCpf(e,i)}>
+                        </input>
                     </div>
                 </DataUser>
             )})}
@@ -180,7 +203,6 @@ function TypeSeats() {
     )
 }
 
-
 const SelectSeatH1 = styled.div`
     width: 100%;
     min-height: 102px;
@@ -203,7 +225,7 @@ const SelectSeatH1 = styled.div`
 `;
 const DataUsersContainer = styled.div`
     overflow: scroll;
-    min-height: 160px;
+    min-height: 180px;
     box-shadow: 0 0 20px #dadada;
     box-sizing: border-box;
     padding: 8px 0;
@@ -228,6 +250,12 @@ const DataUser = styled.div`
     line-height: 21px;
     
     color: #AFAFAF;
+    &.isNotFilled.wasClicked{
+        border: 2px solid rgb(252, 108, 108);
+        ::placeholder{
+            color:rgb(252, 108, 108)
+        }
+    }
     background: #FFFFFF;
 
     border: 1px solid #D5D5D5;
@@ -256,7 +284,6 @@ const ReserveSeat = styled.div`
     align-items: center;
     justify-content: center;
     `
-
 const Button = styled.button`
     width: 225px;
     height: 42px;
@@ -286,7 +313,6 @@ const Seats = styled.div`
     box-sizing: border-box;
     padding: 0 25px;
 `
-
 const Seat = styled.div`
     width: 26px;
     height: 26px;
@@ -307,9 +333,7 @@ const Seat = styled.div`
     
     border: 1px solid #808F9D;
     background: #C3CFD9;
-    color: #000000;
-    
-    
+    color: #000000; 
     &.selected{
         width: 26px;
         height: 26px;
@@ -344,7 +368,6 @@ const TypeSeat = styled.div`
 
 
 `
-
 const TypeSeatsContainer = styled.div`
     width: 100%;
     display: flex;

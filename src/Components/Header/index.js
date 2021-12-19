@@ -39,4 +39,7 @@ const GoBack = styled.div`
     position: absolute;
     left: 25px;
     font-size: 40px;
+    &:hover{
+        cursor: pointer;
+    }
 `
